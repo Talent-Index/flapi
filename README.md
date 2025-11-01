@@ -14,7 +14,9 @@ A dark vampire-themed Flappy Bird clone with creepy ambience, featuring a menaci
 
 - **Halloween Aesthetic**: Dark purple night sky with glowing stars, moon oozing toxic green acid, bubbling green acid ground, purple fog layers
 - **Player**: Glowing jack o' lantern pumpkin with triangular eyes, nose, and a jagged toothy grin. Features subtle bobbing animation and orange glow aura
-- **Obstacles**: Tall pipe-style bloody gravestones (with R.I.P. tombstone caps) and upside-down crosses extending from top and bottom, inspired by Flappy Bird's classic design
+- **Obstacles**: Two types of tall Flappy Bird-style pipe obstacles extending from top and bottom
+  - **Bloody gravestones**: Gray stone pipes with blood drips, cracks, and R.I.P. tombstone caps
+  - **Toxic tombstones**: Glowing lime green tombstones with animated dripping acid goo, glowing cracks, "TOXIC" text, and acid puddles
 - **Audio**: 
   - Continuous creepy ambient drone (low-frequency rumble)
   - Periodic owl hooting (every 8-15 seconds)

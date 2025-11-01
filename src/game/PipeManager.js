@@ -27,13 +27,13 @@ define([], function(){
       var isGrave = i % 2 === 0;
       
       if (isGrave) {
-        // Gravestone
+        // Bloody gravestone
         this.drawGravestone(ctx, p.x + p.w/2, p.top.h, true); // top
         this.drawGravestone(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
       } else {
-        // Upside down cross
-        this.drawCross(ctx, p.x + p.w/2, p.top.h, true); // top
-        this.drawCross(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
+        // Glowing lime green tombstone with acid goo
+        this.drawGlowingTombstone(ctx, p.x + p.w/2, p.top.h, true); // top
+        this.drawGlowingTombstone(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
       }
     }
     ctx.restore();
@@ -105,49 +105,97 @@ define([], function(){
     ctx.restore();
   };
   
-  PipeManager.prototype.drawCross = function(ctx, x, y, isTop){
-    var w = 40, h = isTop ? y : 800; // Extend to edge like pipes
+  PipeManager.prototype.drawGlowingTombstone = function(ctx, x, y, isTop){
+    var w = 50, h = isTop ? y : 800; // Extend to edge like Flappy Bird pipes
     ctx.save();
     ctx.translate(x, isTop ? 0 : y);
-    if (!isTop) { ctx.rotate(Math.PI); }
     
-    // Tall vertical beam (pipe-like)
-    ctx.fillStyle = "#2a1a1a";
-    ctx.strokeStyle = "#1a0a0a";
-    ctx.lineWidth = 2;
-    ctx.fillRect(-w/6, 0, w/3, h);
-    ctx.strokeRect(-w/6, 0, w/3, h);
+    // Glowing lime green stone pipe with glow effect
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "rgba(50, 255, 100, 0.8)";
+    ctx.fillStyle = "#2a4a2a";
+    ctx.strokeStyle = "#32ff64";
+    ctx.lineWidth = 3;
+    ctx.fillRect(-w/2, 0, w, h);
+    ctx.strokeRect(-w/2, 0, w, h);
+    ctx.shadowBlur = 0;
     
-    // Horizontal beam at the end (creates cross shape at bottom/top)
-    var crossY = h - 50;
-    ctx.fillRect(-w/2, crossY, w, w/3);
-    ctx.strokeRect(-w/2, crossY, w, w/3);
+    // Rounded tombstone cap at the end with glow
+    var capY = h - 50;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "rgba(50, 255, 100, 0.8)";
+    ctx.fillStyle = "#2a4a2a";
+    ctx.strokeStyle = "#32ff64";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-w/2, capY);
+    ctx.lineTo(-w/2, h - 15);
+    ctx.arcTo(-w/2, h, 0, h, 15);
+    ctx.arcTo(w/2, h, w/2, h - 15, 15);
+    ctx.lineTo(w/2, capY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
     
-    // Blood splatter along the pipe
-    ctx.fillStyle = "#8b0000";
-    for (var s = 0; s < Math.floor(h / 80); s++) {
-      for (var i = 0; i < 3; i++) {
-        var bx = (Math.random() - 0.5) * w * 0.4;
-        var by = s * 80 + Math.random() * 60;
-        var br = Math.random() * 2 + 1;
-        ctx.beginPath();
-        ctx.arc(bx, by, br, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    
-    // Dripping blood on cross beam
-    ctx.strokeStyle = "#8b0000";
-    ctx.lineWidth = 2;
-    for (var d = 0; d < 3; d++) {
-      var dx = (d - 1) * w/4;
+    // Glowing cracks along the tall pipe
+    ctx.strokeStyle = "#50ff80";
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "rgba(50, 255, 100, 0.6)";
+    for (var c = 0; c < Math.floor(h / 100); c++) {
+      var crackY = c * 100 + 30;
       ctx.beginPath();
-      ctx.moveTo(dx, crossY + w/3);
-      ctx.lineTo(dx, crossY + w/3 + 15);
+      ctx.moveTo(-w/3, crackY);
+      ctx.lineTo(-w/4, crackY + 20);
+      ctx.moveTo(w/4, crackY + 10);
+      ctx.lineTo(w/3, crackY + 30);
       ctx.stroke();
-      ctx.fillStyle = "#8b0000";
+    }
+    ctx.shadowBlur = 0;
+    
+    // Glowing text on cap
+    ctx.fillStyle = "#32ff64";
+    ctx.strokeStyle = "#0a2a0a";
+    ctx.lineWidth = 2;
+    ctx.font = "bold 12px serif";
+    ctx.textAlign = "center";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "rgba(50, 255, 100, 0.9)";
+    ctx.strokeText("TOXIC", 0, h - 25);
+    ctx.fillText("TOXIC", 0, h - 25);
+    ctx.shadowBlur = 0;
+    
+    // Animated dripping acid goo on cap
+    var t = Date.now();
+    ctx.strokeStyle = "#32ff64";
+    ctx.lineWidth = 2.5;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "rgba(50, 255, 100, 0.8)";
+    var drips = [
+      {x: -w/4, y: h - 20, len: Math.sin(t * 0.003) * 3 + 10},
+      {x: w/4, y: h - 22, len: Math.sin(t * 0.004 + 1) * 4 + 14},
+      {x: 0, y: h - 18, len: Math.sin(t * 0.0035 + 2) * 2 + 8}
+    ];
+    for (var i = 0; i < drips.length; i++) {
       ctx.beginPath();
-      ctx.arc(dx, crossY + w/3 + 15, 2, 0, Math.PI * 2);
+      ctx.moveTo(drips[i].x, drips[i].y);
+      ctx.lineTo(drips[i].x, drips[i].y + drips[i].len);
+      ctx.stroke();
+      // Glowing acid drop
+      ctx.fillStyle = "#32ff64";
+      ctx.beginPath();
+      ctx.arc(drips[i].x, drips[i].y + drips[i].len, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    
+    // Acid puddles pooling on the pipe
+    ctx.fillStyle = "rgba(50, 255, 100, 0.4)";
+    for (var p = 0; p < Math.floor(h / 150); p++) {
+      var poolY = p * 150 + 80;
+      ctx.beginPath();
+      ctx.ellipse(0, poolY, w/3, 4, 0, 0, Math.PI * 2);
       ctx.fill();
     }
     
