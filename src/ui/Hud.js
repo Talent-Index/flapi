@@ -1,6 +1,6 @@
 define(["dojo/dom","dojo/dom-construct","dojo/dom-class","dojo/_base/lang","dojo/_base/fx","dojo/fx","app/game/Effects"], function(dom, domConstruct, domClass, lang, baseFx, fx, Effects){
   function Hud(scoreNode, bestNode, walletNode){
-    this.nodes = { score: scoreNode, best: bestNode, overlay: dom.byId('overlay'), wallet: walletNode };
+    this.nodes = { score: scoreNode, best: bestNode, overlay: dom.byId('overlay'), wallet: walletNode, lives: dom.byId('lives') };
   }
   Hud.prototype.setScore = function(v, animate){ 
     this.nodes.score.textContent = v; 
@@ -16,11 +16,19 @@ define(["dojo/dom","dojo/dom-construct","dojo/dom-class","dojo/_base/lang","dojo
       baseFx.animateProperty({node:this.nodes.best,duration:200,delay:200,properties:{opacity:{start:0.3,end:1}}}).play(); 
     }
   };
+  Hud.prototype.setLives = function(v){
+    if(!this.nodes.lives) return;
+    var hearts = '';
+    for(var i = 0; i < v; i++){
+      hearts += '❤️ ';
+    }
+    this.nodes.lives.textContent = hearts || '💀';
+  };
   Hud.prototype.setWalletStatus = function(connected, address){
     if(!this.nodes.wallet) return;
     if(connected){
       var shortAddr = address.slice(0, 6) + '...' + address.slice(-4);
-      this.nodes.wallet.textContent = ' ' + shortAddr;
+      this.nodes.wallet.textContent = '🦇 ' + shortAddr;
       this.nodes.wallet.style.color = '#32ff64';
     } else {
       this.nodes.wallet.textContent = 'Connect Wallet';

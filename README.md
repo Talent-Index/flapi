@@ -14,10 +14,12 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
 
 - **Halloween Aesthetic**: Dark purple night sky with glowing stars, moon oozing toxic green acid, **glowing red lava floor with bubbling hot pools**, purple fog layers
 - **Player**: Glowing jack o' lantern pumpkin with triangular eyes, nose, and a jagged toothy grin. Features subtle bobbing animation and orange glow aura
+  - **Life system**: Start with 1 life. Collect hearts every 7 obstacles to gain extra lives
+  - **Heart power-ups**: Pulsing red hearts appear in the middle of the screen every 7 obstacles
   - **Lava death**: If the jack o' lantern touches the lava floor, it burns to a char with flames engulfing it, fading eyes, and rising smoke
-- **Obstacles**: Two types of tall Flappy Bird-style pipe obstacles extending from top and bottom
-  - **Bloody gravestones**: Gray stone pipes with blood drips, cracks, and R.I.P. tombstone caps
-  - **Toxic tombstones**: Glowing lime green tombstones with animated dripping acid goo, glowing cracks, "TOXIC" text, and acid puddles
+- **Obstacles**: Tall Flappy Bird-style pipe obstacles extending from top and bottom
+  - **Glowing tombstones**: All tombstones glow lime green with animated dripping acid goo, glowing cracks, "TOXIC" text, and acid puddles
+  - Hitting obstacles loses a life instead of instant game over
 - **Audio**: 
   - **Creepy soundtrack**: Looping minor key melody playing throughout (D minor pentatonic) - enhanced volume for atmosphere
   - Continuous creepy ambient drone (low-frequency rumble with LFO modulation)

@@ -7,6 +7,9 @@ define([
       this.audio = new AudioManager();
       this.burning = false;
       this.burnProgress = 0;
+      this.lives = 1;
+      this.hearts = [];
+      this.obstaclesPassed = 0;
       this.reset();
     },
     reset: function(){
@@ -18,13 +21,33 @@ define([
       this.audio.reset();
       this.burning = false;
       this.burnProgress = 0;
+      this.lives = 1;
+      this.hearts = [];
+      this.obstaclesPassed = 0;
+      this.hud.setLives(1);
     },
     onPass: function(){ 
       this.score++; 
+      this.obstaclesPassed++;
       this.hud.setScore(this.score, true); 
       if (this.score === 10) {
         this.audio.playMilestone();
       }
+      
+      // Spawn heart every 7 obstacles
+      if (this.obstaclesPassed % 7 === 0) {
+        this.spawnHeart();
+      }
+    },
+    spawnHeart: function(){
+      // Spawn heart in the middle of the screen vertically
+      this.hearts.push({
+        x: this.canvas.width + 50,
+        y: this.canvas.height / 2,
+        w: 30,
+        h: 30,
+        collected: false
+      });
     },
     start: function(){ if(this.running) return; this.running = true; this.time.last = performance.now(); this.audio.resume(); this.loop(); },
     pause: function(){ this.running=false; },
@@ -46,12 +69,60 @@ define([
       this.pipes.update(dt, this.cfg.pipes.speed);
       this.audio.update(dt);
       
+      // Update hearts
+      for (var i = this.hearts.length - 1; i >= 0; i--) {
+        var heart = this.hearts[i];
+        if (!heart.collected) {
+          heart.x -= this.cfg.pipes.speed * dt;
+          
+          // Check collision with player
+          var playerAABB = this.player.getAABB();
+          if (heart.x < playerAABB.x + playerAABB.w &&
+              heart.x + heart.w > playerAABB.x &&
+              heart.y < playerAABB.y + playerAABB.h &&
+              heart.y + heart.h > playerAABB.y) {
+            this.collectHeart(i);
+          }
+          
+          // Remove if off screen
+          if (heart.x + heart.w < 0) {
+            this.hearts.splice(i, 1);
+          }
+        }
+      }
+      
       // Check lava floor collision
       if (this.player.y >= this.canvas.height - 30 - this.player.r) {
         this.startBurning();
       }
       
-      if(this.pipes.collides(this.player.getAABB())){ this.gameOver(); }
+      // Check pipe collision - lose a life instead of game over
+      if(this.pipes.collides(this.player.getAABB())){ 
+        this.loseLife(); 
+      }
+    },
+    collectHeart: function(index){
+      this.hearts.splice(index, 1);
+      this.lives++;
+      this.hud.setLives(this.lives);
+      this.audio.playMilestone(); // Play happy sound
+      console.log('Heart collected! Lives:', this.lives);
+    },
+    loseLife: function(){
+      if (this.lives <= 0) return; // Already dead
+      
+      this.lives--;
+      this.hud.setLives(this.lives);
+      this.audio.playDeath();
+      
+      if (this.lives <= 0) {
+        this.gameOver();
+      } else {
+        // Flash effect and reposition player
+        this.player.y = this.canvas.height / 2;
+        this.player.vy = 0;
+        console.log('Life lost! Lives remaining:', this.lives);
+      }
     },
     startBurning: function(){
       if (!this.burning) {
@@ -161,6 +232,11 @@ define([
       ctx.fill();
       
       this.pipes.draw(ctx);
+      
+      // Draw hearts
+      for (var i = 0; i < this.hearts.length; i++) {
+        this.drawHeart(ctx, this.hearts[i]);
+      }
       
       if (this.burning) {
         this.drawBurningPlayer(ctx);
@@ -303,8 +379,39 @@ define([
       return [
         Math.floor(c1[0] + (c2[0] - c1[0]) * t),
         Math.floor(c1[1] + (c2[1] - c1[1]) * t),
-        Math.floor(c1[2] + (c2[2] - c1[2]) * t)
+        Math.floor(c1[2] + (c2[2]) - c1[2]) * t)
       ];
+    },
+    drawHeart: function(ctx, heart){
+      ctx.save();
+      ctx.translate(heart.x + heart.w / 2, heart.y + heart.h / 2);
+      
+      // Pulsing animation
+      var pulse = Math.sin(Date.now() * 0.008) * 0.15 + 1;
+      ctx.scale(pulse, pulse);
+      
+      // Glow effect
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "rgba(255, 50, 100, 0.8)";
+      
+      // Draw heart shape
+      ctx.fillStyle = "#ff3366";
+      ctx.beginPath();
+      var size = 12;
+      ctx.moveTo(0, size * 0.3);
+      ctx.bezierCurveTo(-size, -size * 0.3, -size, -size * 0.8, 0, -size * 0.3);
+      ctx.bezierCurveTo(size, -size * 0.8, size, -size * 0.3, 0, size * 0.3);
+      ctx.fill();
+      
+      // Bright center
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = "#ffaacc";
+      ctx.beginPath();
+      ctx.arc(0, -size * 0.2, size * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.shadowBlur = 0;
+      ctx.restore();
     }
   });
   return GameEngine;
