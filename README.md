@@ -1,6 +1,6 @@
 # Flappy Haunt 🦇
 
-A dark vampire-themed Flappy Bird clone with creepy ambience, featuring a menacing crow with glowing red eyes navigating through bloody gravestones and upside-down crosses. Built with Dojo Toolkit (AMD, 1.7+ compatible) for UI/events/effects and canvas for rendering. On-chain highscores are integrated via Cartridge Controller targeting Starknet Sepolia.
+You are a menacing Jack o' Lantern with glowing red eyes navigating through bloody gravestones in a world where the moon oozes green goo. Built with Dojo Toolkit (AMD, 1.7+ compatible) for UI/events/effects and canvas for rendering. On-chain highscores are integrated via Cartridge Controller targeting Starknet Sepolia.
 
 ## Quick Start
 
