@@ -24,10 +24,17 @@ define([], function(){
     ctx.save();
     for(var i=0;i<this.items.length;i++){ 
       var p=this.items[i];
+      var isGrave = i % 2 === 0;
       
-      // All tombstones glow green
-      this.drawGlowingTombstone(ctx, p.x + p.w/2, p.top.h, true); // top
-      this.drawGlowingTombstone(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
+      if (isGrave) {
+        // Bloody gravestone
+        this.drawGravestone(ctx, p.x + p.w/2, p.top.h, true); // top
+        this.drawGravestone(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
+      } else {
+        // Glowing lime green tombstone with acid goo
+        this.drawGlowingTombstone(ctx, p.x + p.w/2, p.top.h, true); // top
+        this.drawGlowingTombstone(ctx, p.x + p.w/2, p.bottom.y, false); // bottom
+      }
     }
     ctx.restore();
   };
