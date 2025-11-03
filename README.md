@@ -1,6 +1,6 @@
 # Flappy Haunt 🦇
 
-You are a menacing Jack o' Lantern with glowing red eyes navigating through bloody gravestones in a world where the moon oozes green goo. Built with Dojo Toolkit (AMD, 1.7+ compatible) for UI/events/effects and canvas for rendering. On-chain highscores are integrated via Cartridge Controller targeting Starknet Sepolia.
+You are a menacing Jack o' Lantern with glowing red eyes navigating through bloody gravestones in a world where the moon oozes green goo. Built with Dojo Toolkit (AMD, 1.7+ compatible) for UI/events/effects and canvas for rendering. On-chain highscores are integrated via Ready wallet (and other Starknet wallets) targeting Starknet Sepolia.
 
 ## Quick Start
 
@@ -27,9 +27,9 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
   - Special milestone sound when reaching score of 10 (triumphant bells)
 - **Physics**: Lighter gravity (650) for floatier gameplay, smooth flapping, deterministic collision detection, progressive difficulty, lava floor instant burn
 - **Web3 Integration**: 
-  - **Starknet wallet connection** via Cartridge Controller on Sepolia testnet
+  - **Starknet wallet connection** via Ready wallet and other standard Starknet wallets on Sepolia testnet
   - **NFT minting**: Mint your high scores (10+) as spooky NFTs on Starknet
-  - Session policies for gasless transactions
+  - Standard wallet integration with transaction approval
   - Wallet status display in HUD
 
 ## Tech
@@ -37,13 +37,14 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
 - Dojo 1.10 (AMD): `dojo/dom`, `dojo/dom-construct`, `dojo/on`, `dojo/keys`, `dojo/_base/fx`, `dojo/fx`
 - Canvas 2D for game rendering with procedural graphics (no image assets)
 - Web Audio API for procedural sound generation (no audio files needed)
-- Cartridge Controller for on-chain scores (Starknet Sepolia)
+- get-starknet for wallet connectivity (Ready, Argent, Braavos, etc.) on Starknet Sepolia
 
 ## Web3 Integration (Starknet)
 
 ### Wallet Connection
-- Click "Connect Wallet" button in HUD to connect via Cartridge Controller
+- Click "Connect Wallet" button in HUD to connect via any Starknet wallet (Ready, Argent, Braavos, etc.)
 - Supports Starknet Sepolia testnet
+- Uses get-starknet modal to let you choose your preferred wallet
 - Wallet address displayed once connected (shortened format)
 - Connection persists during game session
 
@@ -53,20 +54,20 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
   1. Achieve a score of 10+
   2. Ensure wallet is connected
   3. Click "Mint NFT 🎃" button on game over screen
-  4. Transaction automatically executes with session policies
+  4. Approve the transaction in your wallet
   5. Receive confirmation with transaction hash
 - **NFT Data**: 
   - Recipient address
   - Final score (u256)
   - Timestamp (u64)
-- **Contract**: Update `NFT_CONTRACT_ADDRESS` in `CartridgeControllerAdapter.js` with your deployed contract
+- **Contract**: Update `NFT_CONTRACT_ADDRESS` in `StarknetWalletAdapter.js` with your deployed contract
 
 ### Configuration
-- Lazy-loads `@cartridge/controller` and `starknet` from unpkg
+- Lazy-loads `get-starknet-core` and `starknet` from unpkg
 - Network: Starknet Sepolia
-  - RPC: `https://api.cartridge.gg/x/starknet/sepolia`
   - Chain ID: `SN_SEPOLIA`
-- Session policies configured for `mint_score_nft` entrypoint
+- Supports all standard Starknet wallets that implement the wallet standard
+- Uses dark theme modal for wallet selection
 
 ### Deploy Your Own NFT Contract
 ```cairo
@@ -119,10 +120,10 @@ See `.PLAN` for milestones and tasks.
 
 ## Security Notes
 
-- No private keys in client. All signing is performed via Cartridge Controller.
-- Use session policies for gasless gameplay and fewer prompts.
+- No private keys in client. All signing is performed via the connected Starknet wallet.
+- Transactions require user approval through the wallet interface.
 
 ## Deploy
 
 - Host the static files on Netlify/Vercel/Cloudflare Pages.
-- Ensure HTTPS so Cartridge can operate correctly.
+- Ensure HTTPS so Starknet wallets can operate correctly.
