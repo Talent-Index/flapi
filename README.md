@@ -5,7 +5,7 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
 ## Quick Start
 
 - Static run: open `index.html` with a static server
-  - `npx serve` (or any static server) from the project root
+  - `npx serve && npm install` from the project root
   - Open http://localhost:3000 (or the printed URL)
 - Controls: Tap/Click or press Space/Up to flap. P = pause, R = restart.
 - **Audio**: Game includes procedural audio (ambient drone, owl hoots, death sound, milestone bells). Click/tap to start and enable audio context.
@@ -14,12 +14,10 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
 
 - **Halloween Aesthetic**: Dark purple night sky with glowing stars, moon oozing toxic green acid, **glowing red lava floor with bubbling hot pools**, purple fog layers
 - **Player**: Glowing jack o' lantern pumpkin with triangular eyes, nose, and a jagged toothy grin. Features subtle bobbing animation and orange glow aura
-  - **Life system**: Start with 1 life. Collect hearts every 7 obstacles to gain extra lives
-  - **Heart power-ups**: Pulsing red hearts appear in the middle of the screen every 7 obstacles
   - **Lava death**: If the jack o' lantern touches the lava floor, it burns to a char with flames engulfing it, fading eyes, and rising smoke
-- **Obstacles**: Tall Flappy Bird-style pipe obstacles extending from top and bottom
-  - **Glowing tombstones**: All tombstones glow lime green with animated dripping acid goo, glowing cracks, "TOXIC" text, and acid puddles
-  - Hitting obstacles loses a life instead of instant game over
+- **Obstacles**: Two types of tall Flappy Bird-style pipe obstacles extending from top and bottom
+  - **Bloody gravestones**: Gray stone pipes with blood drips, cracks, and R.I.P. tombstone caps
+  - **Toxic tombstones**: Glowing lime green tombstones with animated dripping acid goo, glowing cracks, "TOXIC" text, and acid puddles
 - **Audio**: 
   - **Creepy soundtrack**: Looping minor key melody playing throughout (D minor pentatonic) - enhanced volume for atmosphere
   - Continuous creepy ambient drone (low-frequency rumble with LFO modulation)
@@ -73,9 +71,48 @@ You are a menacing Jack o' Lantern with glowing red eyes navigating through bloo
 
 ### Deploy Your Own NFT Contract
 ```cairo
-// Example entrypoint signature
+// Example entrypoint signature  
 fn mint_score_nft(recipient: ContractAddress, score: u256, timestamp: u64)
 ```
+
+## Starknet Deployment Guide
+
+### Prerequisites
+- Starknet CLI installed (`curl -L https://raw.githubusercontent.com/starkware-libs/starknet-foundry/master/scripts/install.sh | sh`)
+- Starknet account on Sepolia testnet with ETH for gas
+- ArgentX, Braavos, or Cartridge wallet installed
+
+### 1. Deploy NFT Contract
+```bash
+# Compile the contract
+starknet-compile contracts/SpookyScoreNFT.cairo --output contracts/SpookyScoreNFT.json
+
+# Deploy to Sepolia
+starknet deploy --contract contracts/SpookyScoreNFT.json --network sepolia
+```
+
+### 2. Update Contract Address
+After deployment, update the contract address in:
+```javascript
+// src/web3/CartridgeControllerAdapter.js
+var NFT_CONTRACT_ADDRESS = "0x0123..."; // Your deployed contract address
+```
+
+### 3. Wallet Integration
+The game supports multiple Starknet wallets:
+- **ArgentX**: Browser extension wallet
+- **Braavos**: Browser extension wallet  
+- **Cartridge Controller**: Embedded wallet with session keys
+
+### 4. Testing on Sepolia
+1. Get Sepolia ETH from [Starknet Faucet](https://starknet-faucet.vercel.app/)
+2. Deploy your game to a web server
+3. Connect wallet and test NFT minting
+4. Verify transactions on [Starkscan Sepolia](https://sepolia.starkscan.co/)
+
+### 5. Supported Networks
+- **Sepolia Testnet**: `0x534e5f5345504f4c4941` (Development)
+- **Mainnet**: `0x534e5f4d41494e` (Production - update RPC URLs)
 
 ## Development Plan
 

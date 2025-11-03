@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Flappy Haunt 🎃</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="shortcut icon" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="72x72" href="/favicon.png" />
   <link rel="stylesheet" href="./css/styles.css" />
   <link rel="preconnect" href="https://ajax.googleapis.com" crossorigin>
   <script>
@@ -17,6 +21,7 @@
   </script>
   <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
 </head>
+
 <body>
   <div id="app">
     <div style="position:relative">
@@ -25,28 +30,44 @@
         <div class="score" id="score">0</div>
         <div class="best" id="best">Best: 0</div>
         <div class="lives" id="lives">❤️</div>
-        <button class="btn primary" id="btnPlay">Play</button>
         <button class="btn" id="btnPause">Pause</button>
-        <button class="btn" id="btnRestart">Restart</button>
-        <button class="btn wallet-btn" id="walletBtn">Connect Wallet</button>
       </div>
+
+      <!-- Opening Menu -->
+      <div class="overlay" id="startMenu">
+        <div class="panel">
+          <h1>Flappy Haunt 🎃</h1>
+          <p>Tap or press Space/Up to flap.</p>
+          <p>Press Enter or click Pause to pause.</p>
+          <p><strong>Pass 7 obstacles and get 1 $FLAPPY</strong></p>
+          <p class="small">$FLAPPY is the utility token in the Flappy Haunt universe.</p>
+          <p class="small">1 $FLAPPY = 1 Life</p>
+          <div class="menu-buttons">
+            <button class="btn primary" id="btnPlay">Play Game</button>
+            <button class="btn wallet-btn" id="walletBtn">Connect Starknet Wallet</button>
+            <button class="btn" id="btnRestart">Restart Game</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
       <div class="overlay hidden" id="overlay">
         <div class="panel">
           <h1>Flappy Haunt</h1>
-          <p>Tap or press Space/Up to flap.</p>
-          <p class="small">Connect to save your high score on Starknet Sepolia.</p>
           <p id="overlayText">Game Over</p>
           <p id="nftMessage" style="display:none; color:#32ff64; margin:10px 0; font-size:14px;"></p>
-          <button class="btn primary" id="restart">Play Again</button>
-          <button class="btn accent" id="mintBtn" style="display:none; margin-top:10px;">Mint NFT 🎃</button>
+          <div class="menu-buttons">
+            <button class="btn primary" id="restart">Play Again</button>
+            <button class="btn" id="backToMenu">Main Menu</button>
+            <button class="btn accent" id="mintBtn" style="display:none; margin-top:10px;">Mint NFT 🎃</button>
+          </div>
         </div>
-        <p>Tap or press Space/Up to flap.</p>
-        <p class="small">Connect to save your high score on Starknet Sepolia.</p>
       </div>
     </div>
   </div>
   <script>
-    require(["app/main"], function(main){ /* boot */ });
+    require(["app/main"], function (main) { /* boot */ });
   </script>
 </body>
+
 </html>

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@cartridge/controller": "^0.10.7",
+    "starknet": "^8.6.0"
+  }
+}
