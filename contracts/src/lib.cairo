@@ -1,10 +1,11 @@
 // Spooky Score NFT Contract for Flappy Haunt
-// Deploy this contract to Starknet Sepolia and update the address in CartridgeControllerAdapter.js
+// Deploy this contract to Starknet Sepolia and update the address in StarknetWalletAdapter.js
 
 #[starknet::contract]
 mod SpookyScoreNFT {
-    use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
-    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess, Map};
+    use starknet::ContractAddress;
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess, Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use core::num::traits::Zero;
 
     #[storage]
     struct Storage {
@@ -27,8 +28,11 @@ mod SpookyScoreNFT {
 
     #[derive(Drop, starknet::Event)]
     struct Transfer {
+        #[key]
         from: ContractAddress,
+        #[key]
         to: ContractAddress,
+        #[key]
         token_id: u256,
     }
 
@@ -72,8 +76,9 @@ mod SpookyScoreNFT {
             self.next_token_id.write(token_id + 1);
             
             // Emit events
+            let zero_address: ContractAddress = Zero::zero();
             self.emit(Transfer { 
-                from: starknet::contract_address_const::<0>(), 
+                from: zero_address, 
                 to: recipient, 
                 token_id 
             });
@@ -115,7 +120,7 @@ mod SpookyScoreNFT {
 
         fn token_uri(self: @ContractState, token_id: u256) -> ByteArray {
             // Return base URI + token_id for metadata
-            let mut uri = self.token_uri_base.read();
+            let uri = self.token_uri_base.read();
             // In production, append token_id and .json
             uri
         }

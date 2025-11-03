@@ -1,19 +1,20 @@
-define(["dojo/_base/lang"], function(lang){
-  var wallet = null; 
-  var account = null; 
+define(["dojo/_base/lang"], function(lang) {
+  var wallet = null;
+  var account = null;
   var constants = null;
   var Contract = null;
   
   // NFT Contract Configuration 
-  var NFT_CONTRACT_ADDRESS = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"; // Placeholder
+  var NFT_CONTRACT_ADDRESS = "0x01a670c9f5766759970aa71b9d754825490d29c35fedfd2cbd63d9b9f4175f2b"; // Deployed on Sepolia
   
-  function ensureLibraries(){
-    if(constants) return Promise.resolve();
+  function ensureLibraries() {
+    if (constants) return Promise.resolve();
+    
     // Lazy-load get-starknet and starknet.js via unpkg
     return Promise.all([
       import('https://unpkg.com/get-starknet-core@3.3.3/dist/index.mjs'),
       import('https://unpkg.com/starknet@latest/dist/index.mjs')
-    ]).then(function(mods){
+    ]).then(function(mods) {
       var getStarknet = mods[0];
       constants = mods[1].constants;
       Contract = mods[1].Contract;
@@ -25,53 +26,55 @@ define(["dojo/_base/lang"], function(lang){
   }
   
   return {
-    connect: function(){
-      return ensureLibraries().then(function(){ 
+    connect: function() {
+      return ensureLibraries().then(function() { 
         // Use get-starknet to connect to any Starknet wallet (Ready, Argent, Braavos...)
-        return window.getStarknet({
-          modalMode: "alwaysAsk",
-          modalTheme: "dark"
-        });
-      }).then(function(starknetWallet){ 
-        if(!starknetWallet) throw new Error('No Starknet wallet found');
-        
-        wallet = starknetWallet;
+        const starknet = window.getStarknet();
         
         // Enable the wallet and get account
-        return wallet.enable({ 
-          starknetVersion: "v5"
+        return starknet.enable({
+          modalMode: "alwaysAsk",
+          modalTheme: "dark"
+        }).then(function() {
+          if (!starknet.isConnected) {
+            throw new Error('Wallet connection failed');
+          }
+          
+          wallet = starknet;
+          account = starknet.account;
+          
+          if (!account || !account.address) {
+            throw new Error('Could not get account address');
+          }
+          
+          console.log('Connected to Starknet wallet:', account.address);
+          return { 
+            address: account.address,
+            account: account
+          };
         });
-      }).then(function(addresses){
-        if(!addresses || addresses.length === 0) {
-          throw new Error('Wallet connection failed');
-        }
-        
-        // Get the account object
-        account = wallet.account;
-        
-        console.log('Connected to Starknet wallet:', addresses[0]);
-        return { address: addresses[0] }; 
+      }).catch(function(error) {
+        console.error('Wallet connection error:', error);
+        throw error;
       });
     },
     
-    isConnected: function(){ 
-      return !!account && wallet && wallet.isConnected; 
+    isConnected: function() { 
+      return !!(account && wallet && wallet.isConnected); 
     },
     
-    getAddress: function(){
+    getAddress: function() {
       return account ? account.address : null;
     },
     
-    disconnect: function(){
-      account = null;
+    disconnect: function() {
       wallet = null;
+      account = null;
     },
     
-    mintScoreNFT: function(score){
-      return ensureLibraries().then(function(){
-        if(!account) throw new Error('Wallet not connected');
-        
-        console.log('Minting Spooky NFT for score:', score);
+    mintScoreNFT: function(score) {
+      return ensureLibraries().then(function() {
+        if (!account) throw new Error('Wallet not connected');
         
         // Call the mint_score_nft function on the contract
         // Parameters: recipient (address), score (u256), timestamp (u64)
@@ -79,47 +82,43 @@ define(["dojo/_base/lang"], function(lang){
         
         // Construct calldata for u256 score (split into low and high)
         var scoreLow = score;
-        var scoreHigh = 0;
+        var scoreHigh = '0x0';
         
-        return account.execute([
-          {
-            contractAddress: NFT_CONTRACT_ADDRESS,
-            entrypoint: 'mint_score_nft',
-            calldata: [
-              account.address, // recipient
-              scoreLow,        // score low (u128)
-              scoreHigh,       // score high (u128) - u256 is split into two u128
-              timestamp        // timestamp (u64)
-            ]
-          }
-        ]);
-      }).then(function(result){
-        console.log('NFT Minted! Transaction:', result.transaction_hash);
+        // Call the contract
+        return account.execute({
+          contractAddress: NFT_CONTRACT_ADDRESS,
+          entrypoint: 'mint_score_nft',
+          calldata: [
+            account.address,  // recipient
+            scoreLow,         // score low
+            scoreHigh,        // score high (0 for u256)
+            timestamp         // timestamp
+          ]
+        });
+      }).then(function(result) {
+        console.log('NFT mint transaction:', result);
         return {
           success: true,
           txHash: result.transaction_hash,
-          message: 'Spooky NFT minted successfully! 🎃'
+          message: 'NFT minted successfully!'
         };
-      }).catch(function(err){
-        console.error('NFT Minting failed:', err);
+      }).catch(function(error) {
+        console.error('Error minting NFT:', error);
         return {
           success: false,
-          error: err.message || 'Minting failed'
+          error: error.message
         };
       });
     },
     
-    submitScore: function(score){
-      // Submit score to leaderboard contract (if different from NFT contract)
-      return ensureLibraries().then(function(){
-        if(!account) throw new Error('Not connected');
-        console.log('Submitting score to leaderboard:', score);
-        // Implement leaderboard submission if needed
-        return { txHash: '0x0' }; 
-      });
+    submitScore: function(score) {
+      // For future leaderboard implementation
+      return Promise.resolve({ success: true });
     },
     
-    fetchLeaderboard: function(){ 
+    fetchLeaderboard: function() {
+      // For future leaderboard implementation
+      return Promise.resolve([]);
       return Promise.resolve([]); 
     }
   };

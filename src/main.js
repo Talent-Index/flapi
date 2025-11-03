@@ -91,7 +91,7 @@ define([
     state.currentScore = score;
     overlayText.textContent = 'Game Over - Score: ' + score;
     
-    if(state.walletConnected && score >= 10){
+    if(state.walletConnected && score >= 5){
       btnMint.style.display = 'block';
       btnMint.disabled = false;
       btnMint.textContent = 'Mint NFT 🎃';
